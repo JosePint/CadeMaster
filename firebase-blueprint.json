@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account information and global stats",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "totalLessonsCompleted": { "type": "integer" },
+        "totalPoints": { "type": "integer" },
+        "averageGrade": { "type": "number" },
+        "lastActive": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Track": {
+      "title": "Learning Track",
+      "description": "A specific programming language or technology track",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string" },
+        "color": { "type": "string" },
+        "difficulty": { "type": "string", "enum": ["beginner", "intermediate", "advanced"] }
+      }
+    },
+    "Lesson": {
+      "title": "Lesson Content",
+      "description": "Individual lesson content for a track",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "trackId": { "type": "string" },
+        "order": { "type": "integer" },
+        "title": { "type": "string" },
+        "content": { "type": "string", "description": "Markdown content" },
+        "exerciseType": { "type": "string", "enum": ["multiple_choice", "code"] },
+        "exerciseData": { "type": "object" },
+        "points": { "type": "integer" }
+      }
+    },
+    "Progress": {
+      "title": "User Progress",
+      "description": "Tracking user completion of lessons",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "lessonId": { "type": "string" },
+        "trackId": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "score": { "type": "integer" },
+        "feedback": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Public user profile and stats"
+    },
+    "tracks/{trackId}": {
+      "schema": "Track",
+      "description": "Available learning tracks"
+    },
+    "tracks/{trackId}/lessons/{lessonId}": {
+      "schema": "Lesson",
+      "description": "Lessons within a track"
+    },
+    "users/{userId}/progress/{progressId}": {
+      "schema": "Progress",
+      "description": "User completion data for specific lessons"
+    }
+  }
+}

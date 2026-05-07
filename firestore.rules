@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    function isValidId(id) {
+      return id is string && id.size() <= 64;
+    }
+    function incoming() {
+      return request.resource.data;
+    }
+    function existing() {
+      return resource.data;
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.uid == userId && 
+               data.email is string && data.email.size() <= 100;
+      }
+
+      allow read, get, list: if isSignedIn(); 
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming());
+    }
+
+    // Tracks and Lessons
+    match /tracks/{trackId} {
+      allow read, write: if isSignedIn();
+    }
+
+    match /tracks/{trackId}/lessons/{lessonId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // User Progress
+    match /users/{userId}/progress/{progressId} {
+      function isValidProgress(data) {
+        return data.userId == userId &&
+               data.lessonId is string &&
+               data.score is int && data.score >= 0 &&
+               data.updatedAt == request.time;
+      }
+
+      allow read: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidProgress(incoming());
+      allow update: if isOwner(userId) && isValidProgress(incoming()) &&
+                    incoming().lessonId == existing().lessonId;
+      allow delete: if isOwner(userId);
+    }
+  }
+}
