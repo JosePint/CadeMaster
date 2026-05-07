@@ -55,13 +55,15 @@ export default function Navbar({ profile, onNavigate }: NavbarProps) {
               className="w-full h-full object-cover"
             />
           </div>
-          <button 
-            onClick={logOut}
-            className="p-2 text-slate-400 hover:text-red-400 transition-colors"
-            title="Sair"
-          >
-            <LogOut size={18} />
-          </button>
+          {profile?.uid !== 'guest' && (
+            <button 
+              onClick={logOut}
+              className="p-2 text-slate-400 hover:text-red-400 transition-colors"
+              title="Sair"
+            >
+              <LogOut size={18} />
+            </button>
+          )}
         </div>
       </div>
     </nav>

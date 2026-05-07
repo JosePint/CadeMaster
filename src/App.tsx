@@ -25,7 +25,6 @@ export default function App() {
           if (snapshot.exists()) {
             setProfile(snapshot.data() as UserProfile);
           } else {
-            // Create profile
             const newProfile: UserProfile = {
               uid: user.uid,
               email: user.email || '',
@@ -45,7 +44,17 @@ export default function App() {
           setLoading(false);
         });
       } else {
-        setProfile(null);
+        // Guest mode setup
+        setProfile({
+          uid: 'guest',
+          email: 'guest@codemaster.ai',
+          displayName: 'Estudante Convidado',
+          photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=guest',
+          totalLessonsCompleted: 0,
+          totalPoints: 0,
+          averageGrade: 0,
+          lastActive: new Date()
+        });
         setLoading(false);
       }
     });
@@ -54,8 +63,6 @@ export default function App() {
   }, []);
 
   if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-slate-50"><LoadingSpinner /></div>;
-
-  if (!user) return <Login />;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col">
